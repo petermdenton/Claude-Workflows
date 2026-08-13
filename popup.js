@@ -1,4 +1,4 @@
-// Claude Vault — popup UI
+// Claude Workflows — popup UI
 
 const view = document.getElementById('view');
 let pollTimer = null;
@@ -47,7 +47,7 @@ async function renderList() {
     listHtml = `
       <div class="empty">
         <div class="lock">🔒</div>
-        <div>The vault is empty.</div>
+        <div>No workflows yet.</div>
         <div style="margin-top:4px;font-size:11.5px">Go to a website, hit record, and walk through the task once.</div>
       </div>`;
   } else {
@@ -63,7 +63,7 @@ async function renderList() {
       <span class="record-dot"></span>Record a procedure on this page
     </button>
     ${recordable ? '' : `<div class="warn">Open a normal website tab to record (Chrome pages can't be recorded).</div>`}
-    ${recordable && tab.url.startsWith('file:') ? `<div class="warn">Local file — make sure "Allow access to file URLs" is ON for Claude Vault in chrome://extensions, or the recorder can't see this page.</div>` : ''}
+    ${recordable && tab.url.startsWith('file:') ? `<div class="warn">Local file — make sure "Allow access to file URLs" is ON for Claude Workflows in chrome://extensions, or the recorder can't see this page.</div>` : ''}
     <div style="height:12px"></div>
     ${listHtml}
   `;
@@ -109,7 +109,7 @@ function renderRecording(rec) {
       <div class="hint">steps captured on ${esc(hostOf(rec.startUrl))} — do the task in the page, then come back here.</div>
     </div>
     <div class="btn-row">
-      <button class="btn-primary" id="stop">Stop &amp; save to vault</button>
+      <button class="btn-primary" id="stop">Stop &amp; save workflow</button>
       <button class="btn-danger" id="discard">Discard</button>
     </div>
   `;
@@ -135,7 +135,7 @@ async function renderDetail(id) {
   if (!p) return renderList();
 
   view.innerHTML = `
-    <span class="back" id="back">← Vault</span>
+    <span class="back" id="back">← Workflows</span>
     <div class="detail-title">${esc(p.name)}</div>
     <div class="detail-meta">${esc(hostOf(p.startUrl))} · recorded ${fmtDate(p.createdAt)}</div>
     <ol class="steps">
@@ -159,10 +159,10 @@ async function renderDetail(id) {
     const zip = makeZip([{ path: `${name}/SKILL.md`, text: skillMd(p) }]);
     const url = URL.createObjectURL(new Blob([zip], { type: 'application/zip' }));
     chrome.downloads.download(
-      { url, filename: `ClaudeVault/${name}.skill`, conflictAction: 'overwrite', saveAs: false },
+      { url, filename: `ClaudeWorkflows/${name}.skill`, conflictAction: 'overwrite', saveAs: false },
       () => {
         void chrome.runtime.lastError;
-        note(`${name}.skill packaged into Downloads/ClaudeVault — drop it on Claude and approve the save. (Claude requires your approval to install skills — by design.)`);
+        note(`${name}.skill packaged into Downloads/ClaudeWorkflows — drop it on Claude and approve the save. (Claude requires your approval to install skills — by design.)`);
       }
     );
   });
@@ -280,12 +280,12 @@ function skillMd(p) {
 
   return `---
 name: ${slug(p.name)}
-description: Replay the "${p.name}" procedure on ${host}, recorded with Claude Vault. Use when the user asks to ${p.name.toLowerCase()} or perform this task on ${host}.
+description: Replay the "${p.name}" procedure on ${host}, recorded with Claude Workflows. Use when the user asks to ${p.name.toLowerCase()} or perform this task on ${host}.
 ---
 
 # ${p.name}
 
-Recorded with Claude Vault on ${new Date(p.createdAt).toISOString().slice(0, 10)} from ${p.startUrl}.
+Recorded with Claude Workflows on ${new Date(p.createdAt).toISOString().slice(0, 10)} from ${p.startUrl}.
 This is a procedure playbook: it contains navigation steps only — **no credentials are stored in this file.**
 
 ## How to run
@@ -314,7 +314,7 @@ ${hasSecret ? `
 
 If a step's element can't be found, look for an equivalent control by label or
 purpose. If the flow has changed materially, tell the user this recording is
-stale and offer to re-record it with Claude Vault.
+stale and offer to re-record it with Claude Workflows.
 `;
 }
 

@@ -1,4 +1,4 @@
-// Claude Vault — page recorder (content script)
+// Claude Workflows — page recorder (content script)
 //
 // SECURITY MODEL: this script records WHAT you interacted with, never what you
 // typed. Input values are never read, never stored, never transmitted. Password
@@ -173,7 +173,7 @@
     ].join(';'));
     badge.innerHTML =
       '<span style="width:8px;height:8px;border-radius:50%;background:#ff5470;display:inline-block;animation:cvpulse 1.2s infinite"></span>' +
-      '<span><b>Claude Vault</b> recording steps — never values</span>';
+      '<span><b>Claude Workflows</b> recording steps — never values</span>';
     const style = document.createElement('style');
     style.textContent = '@keyframes cvpulse{0%,100%{opacity:1}50%{opacity:.35}}';
     badge.appendChild(style);

@@ -1,14 +1,14 @@
 {
   "manifest_version": 3,
-  "name": "Claude Vault",
-  "version": "0.3.0",
+  "name": "Claude Workflows",
+  "version": "0.4.0",
   "description": "Record website procedures as secure, credential-free playbooks Claude can replay. Steps are saved — secrets never are.",
   "permissions": ["storage", "tabs", "scripting", "downloads"],
   "host_permissions": ["<all_urls>"],
   "background": { "service_worker": "background.js" },
   "action": {
     "default_popup": "popup.html",
-    "default_title": "Claude Vault",
+    "default_title": "Claude Workflows",
     "default_icon": {
       "16": "icons/icon16.png",
       "48": "icons/icon48.png",

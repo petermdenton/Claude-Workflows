@@ -1,4 +1,4 @@
-# Claude Vault 🔒
+# Claude Workflows 🔒
 
 Record website procedures as secure, credential-free playbooks that Claude can replay.
 
@@ -12,17 +12,17 @@ Built in an afternoon with Claude (Cowork). MIT licensed.
 
 1. Open `chrome://extensions` in Chrome.
 2. Turn on **Developer mode** (top-right toggle).
-3. Click **Load unpacked** and select this `claude-vault` folder.
+3. Click **Load unpacked** and select this `Claude Workflows` folder.
 4. Pin the lock icon from the puzzle-piece menu.
 
 ## Use
 
-1. Go to any website and click the Claude Vault icon.
+1. Go to any website and click the Claude Workflows icon.
 2. Hit **Record a procedure on this page**, name it, and start.
 3. Do the task once in the page — a small badge reminds you it's recording steps, never values. Type passwords freely; they are not captured.
 4. Click the icon again → **Stop & save to vault**.
-5. **Automatic handoff:** every save also writes a `SKILL.md` to `Downloads/ClaudeVault/`. Connect that folder to a Claude (Cowork) session once, and Claude picks up new recordings by itself — no manual export.
-6. **Save Skill:** open a procedure → **Save Skill** packages it as a ready-to-install `<name>.skill` file in `Downloads/ClaudeVault/`. Drop it on Claude and approve the save — Claude requires your explicit approval to install skills (by design: skills are instructions, and nothing should be able to install instructions into your agent silently).
+5. **Automatic handoff:** every save also writes a `SKILL.md` to `Downloads/ClaudeWorkflows/`. Connect that folder to a Claude (Cowork) session once, and Claude picks up new recordings by itself — no manual export.
+6. **Save Skill:** open a procedure → **Save Skill** packages it as a ready-to-install `<name>.skill` file in `Downloads/ClaudeWorkflows/`. Drop it on Claude and approve the save — Claude requires your explicit approval to install skills (by design: skills are instructions, and nothing should be able to install instructions into your agent silently).
 7. Manual route still works too: **SKILL.md** / **Copy** and give it to Claude.
 
 ## What gets recorded

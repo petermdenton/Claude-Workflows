@@ -1,4 +1,4 @@
-// Claude Vault — background service worker
+// Claude Workflows — background service worker
 // Holds the in-progress recording in session storage (cleared when Chrome closes)
 // and the saved procedure library in local storage. No credential values ever pass
 // through here — the content script never captures them in the first place.
@@ -65,7 +65,7 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
             await chrome.storage.local.set({ procedures });
             await clearRec();
             await notifyTab(rec.tabId, 'rec-off');
-            autoExport(proc); // fire-and-forget: SKILL.md → Downloads/ClaudeVault/
+            autoExport(proc); // fire-and-forget: SKILL.md → Downloads/ClaudeWorkflows/
           }
           sendResponse({ ok: true });
           break;
@@ -135,7 +135,7 @@ chrome.tabs.onUpdated.addListener(async (tabId, changeInfo) => {
 
 // ---------- auto-export: vault sync folder ----------
 // Every saved procedure is also written as a SKILL.md into
-// Downloads/ClaudeVault/ so a connected Claude (Cowork) session can pick it
+// Downloads/ClaudeWorkflows/ so a connected Claude (Cowork) session can pick it
 // up automatically — no manual export needed. The file contains procedure
 // steps only; credentials are never recorded anywhere.
 
@@ -157,12 +157,12 @@ function skillMd(p) {
 
   return `---
 name: ${slug(p.name)}
-description: Replay the "${p.name}" procedure on ${host}, recorded with Claude Vault. Use when the user asks to ${p.name.toLowerCase()} or perform this task on ${host}.
+description: Replay the "${p.name}" procedure on ${host}, recorded with Claude Workflows. Use when the user asks to ${p.name.toLowerCase()} or perform this task on ${host}.
 ---
 
 # ${p.name}
 
-Recorded with Claude Vault on ${new Date(p.createdAt).toISOString().slice(0, 10)} from ${p.startUrl}.
+Recorded with Claude Workflows on ${new Date(p.createdAt).toISOString().slice(0, 10)} from ${p.startUrl}.
 This is a procedure playbook: it contains navigation steps only — **no credentials are stored in this file.**
 
 ## How to run
@@ -191,7 +191,7 @@ ${hasSecret ? `
 
 If a step's element can't be found, look for an equivalent control by label or
 purpose. If the flow has changed materially, tell the user this recording is
-stale and offer to re-record it with Claude Vault.
+stale and offer to re-record it with Claude Workflows.
 `;
 }
 
@@ -202,7 +202,7 @@ function autoExport(proc) {
     chrome.downloads.download(
       {
         url,
-        filename: `ClaudeVault/${slug(proc.name)}-SKILL.md`,
+        filename: `ClaudeWorkflows/${slug(proc.name)}-SKILL.md`,
         conflictAction: 'overwrite',
         saveAs: false
       },
