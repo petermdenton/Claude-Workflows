@@ -11,6 +11,7 @@
 
   let active = false;
   let badge = null;
+  let cleanupBadge = null;
 
   // ---------- element description helpers ----------
 
@@ -169,18 +170,108 @@
       'background:#1a1523', 'color:#f5f0ff',
       'border:1px solid #7c5cff', 'border-radius:10px',
       'padding:8px 12px', 'font:12px/1.4 system-ui,sans-serif',
-      'box-shadow:0 4px 16px rgba(0,0,0,.35)', 'pointer-events:none'
+      'box-shadow:0 4px 16px rgba(0,0,0,.35)', 'pointer-events:auto',
+      'cursor:grab', 'touch-action:none', 'user-select:none',
+      'box-sizing:border-box', 'width:max-content', 'max-width:calc(100vw - 16px)'
     ].join(';'));
     badge.innerHTML =
       '<span style="width:8px;height:8px;border-radius:50%;background:#ff5470;display:inline-block;animation:cvpulse 1.2s infinite"></span>' +
-      '<span><b>Claude Workflows</b> recording steps — never values</span>';
+      '<span aria-hidden="true">⠿</span>' +
+      '<span><b>Claude Workflows</b> recording steps, never values</span>';
+    badge.tabIndex = 0;
+    badge.setAttribute('role', 'button');
+    badge.setAttribute('aria-label', 'Move recording badge. Drag or use arrow keys.');
+    badge.title = 'Drag to move. When focused, use arrow keys (Shift for larger steps).';
     const style = document.createElement('style');
     style.textContent = '@keyframes cvpulse{0%,100%{opacity:1}50%{opacity:.35}}';
     badge.appendChild(style);
     document.documentElement.appendChild(badge);
+    const current = badge;
+    const positionKey = 'recordingBadgePosition';
+    let drag = null;
+    let moved = false;
+
+    function place(x, y) {
+      const rect = current.getBoundingClientRect();
+      const left = Math.max(8, Math.min(x, window.innerWidth - rect.width - 8));
+      const top = Math.max(8, Math.min(y, window.innerHeight - rect.height - 8));
+      Object.assign(current.style, {
+        left: `${left}px`, top: `${top}px`, right: 'auto', bottom: 'auto'
+      });
+    }
+
+    function savePosition() {
+      const rect = current.getBoundingClientRect();
+      try {
+        chrome.storage.local.set({ [positionKey]: { x: rect.left, y: rect.top } }, () => {
+          void chrome.runtime.lastError;
+        });
+      } catch { /* extension may have been reloaded */ }
+    }
+
+    current.addEventListener('pointerdown', (event) => {
+      if (!event.isPrimary || event.button !== 0) return;
+      event.preventDefault();
+      event.stopPropagation();
+      moved = true;
+      const rect = current.getBoundingClientRect();
+      drag = { id: event.pointerId, x: event.clientX - rect.left, y: event.clientY - rect.top };
+      current.setPointerCapture(event.pointerId);
+      current.style.cursor = 'grabbing';
+      current.focus({ preventScroll: true });
+    });
+    current.addEventListener('pointermove', (event) => {
+      if (!drag || event.pointerId !== drag.id) return;
+      event.stopPropagation();
+      place(event.clientX - drag.x, event.clientY - drag.y);
+    });
+    function endDrag(event) {
+      if (!drag || event.pointerId !== drag.id) return;
+      const id = drag.id;
+      drag = null;
+      if (current.hasPointerCapture(id)) current.releasePointerCapture(id);
+      current.style.cursor = 'grab';
+      event.stopPropagation();
+      savePosition();
+    }
+    current.addEventListener('pointerup', endDrag);
+    current.addEventListener('pointercancel', endDrag);
+    current.addEventListener('lostpointercapture', endDrag);
+    current.addEventListener('click', (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+    });
+    current.addEventListener('keydown', (event) => {
+      const directions = { ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, -1], ArrowDown: [0, 1] };
+      const direction = directions[event.key];
+      if (!direction) return;
+      event.preventDefault();
+      event.stopPropagation();
+      moved = true;
+      const rect = current.getBoundingClientRect();
+      const distance = event.shiftKey ? 40 : 10;
+      place(rect.left + direction[0] * distance, rect.top + direction[1] * distance);
+      savePosition();
+    });
+    function keepVisible() {
+      const rect = current.getBoundingClientRect();
+      place(rect.left, rect.top);
+    }
+    window.addEventListener('resize', keepVisible);
+    cleanupBadge = () => window.removeEventListener('resize', keepVisible);
+    try {
+      chrome.storage.local.get(positionKey, (stored) => {
+        if (chrome.runtime.lastError || badge !== current || moved) return;
+        const position = stored && stored[positionKey];
+        if (position && Number.isFinite(position.x) && Number.isFinite(position.y)) {
+          place(position.x, position.y);
+        }
+      });
+    } catch { /* default position still works if storage is unavailable */ }
   }
 
   function hideBadge() {
+    if (cleanupBadge) { cleanupBadge(); cleanupBadge = null; }
     if (badge) { badge.remove(); badge = null; }
   }
 

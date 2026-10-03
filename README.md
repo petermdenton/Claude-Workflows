@@ -20,6 +20,7 @@ Built in an afternoon with Claude (Cowork). MIT licensed.
 1. Go to any website and click the Claude Workflows icon.
 2. Hit **Record a procedure on this page**, name it, and start.
 3. Do the task once in the page — a small badge reminds you it's recording steps, never values. Type passwords freely; they are not captured.
+   Drag the recording badge anywhere to uncover page controls. Its position is remembered across pages. You can also focus it with Tab and use arrow keys to move it, or Shift + arrow keys for larger steps.
 4. Click the icon again → **Stop & save to vault**.
 5. **Automatic handoff:** every save also writes a `SKILL.md` to `Downloads/ClaudeWorkflows/`. Connect that folder to a Claude (Cowork) session once, and Claude picks up new recordings by itself — no manual export.
 6. **Save Skill:** open a procedure → **Save Skill** packages it as a ready-to-install `<name>.skill` file in `Downloads/ClaudeWorkflows/`. Drop it on Claude and approve the save — Claude requires your explicit approval to install skills (by design: skills are instructions, and nothing should be able to install instructions into your agent silently).
